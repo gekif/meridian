@@ -1,0 +1,167 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Project Meridian: Workforce Decision Room</title>
+<style>
+:root{--ink:#12202e;--paper:#eff2f1;--card:#fafbfa;--teal:#0f6b6b;--amb:#b87400;--mut:#5b6b78;--rule:#cdd5d3}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:var(--paper);color:var(--ink);font:15px/1.5 "Avenir Next","Segoe UI",Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums;min-width:980px}
+#app{display:grid;grid-template-columns:210px 1fr;min-height:100%}
+nav{background:var(--ink);color:#c9d6de;padding:28px 0}
+nav h2{font:600 17px Georgia,serif;color:#fff;margin:0 22px 26px;line-height:1.25}
+nav button{display:block;width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;padding:10px 22px;cursor:pointer;border-left:3px solid transparent}
+nav button.on{color:#fff;background:#1b3042;border-left-color:#e0a82e}
+nav button span{display:inline-block;width:20px;color:#7f93a3}
+main{padding:44px 56px 70px;max-width:1080px}
+h1{font:600 36px/1.15 Georgia,serif;margin:0 0 18px;max-width:760px}
+h3{font:600 17px Georgia,serif;margin:30px 0 10px}
+p{max-width:680px;margin:0 0 12px}.mut{color:var(--mut)}.sm{font-size:13px}
+.big{font:600 64px/1 Georgia,serif}.row{display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap}
+.btn{background:var(--ink);color:#fff;border:0;padding:12px 20px;font:600 15px inherit;cursor:pointer;border-radius:3px;margin-top:18px}
+.btn[disabled]{background:#9aa7b0;cursor:not-allowed}.btn.alt{background:none;color:var(--ink);border:1.5px solid var(--ink)}
+.t{border-bottom:1.5px dotted var(--ink);cursor:help}.t:hover{background:#dfe7e5}
+.bar{display:flex;height:40px;margin:10px 0 6px;gap:3px}
+.bar div{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;min-width:2px;overflow:hidden}
+.m{background:var(--ink);color:#fff}.i{background:repeating-linear-gradient(45deg,#fff 0 2px,#9fb0ba 2px 6px);border:1.5px solid var(--ink)}
+.a{border:1.5px dashed var(--ink)}.sp{border:1.5px dashed var(--amb);color:var(--amb)}.k{background:#cbd3d1}
+table{border-collapse:collapse;width:100%;max-width:880px}th{font-weight:600;text-align:left;font-size:13px;color:var(--mut);border-bottom:1.5px solid var(--ink);padding:6px 10px 6px 0}
+td{padding:9px 10px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top}td.r,th.r{text-align:right}
+.key{display:flex;gap:20px;font-size:13px;margin:8px 0 18px;color:var(--mut)}.key i{display:inline-block;width:26px;height:12px;vertical-align:-1px;margin-right:6px}
+.ex{display:grid;grid-template-columns:260px 1fr 120px;gap:14px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule);cursor:pointer}
+.ex .b{height:18px}.sl{width:100%;max-width:560px;accent-color:var(--ink)}
+.split{display:grid;grid-template-columns:1fr 280px;gap:36px;align-items:start}
+.side{border-left:3px solid var(--ink);padding-left:18px}.side .n{font:600 34px Georgia,serif}
+.warn{border-left:3px solid var(--amb);padding:6px 14px;background:#f7ecd3;max-width:680px;margin:14px 0}
+.ppl{display:grid;grid-template-columns:250px 1fr;gap:34px}.pl button{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:9px 6px;font:inherit;cursor:pointer}
+.pl button.on{background:#dfe7e5}.pip{display:inline-flex;gap:3px;vertical-align:middle}.pip u{width:14px;height:10px;display:block;border:1.5px solid var(--ink);text-decoration:none}
+.pip u.f{background:var(--ink)}.pip.hc u.f{background:repeating-linear-gradient(45deg,#fff 0 2px,#9fb0ba 2px 6px)}.pip.d u{border-style:dashed}
+.act{display:flex;gap:10px;align-items:center;margin:8px 0}.lock{color:var(--mut);font-size:13px}
+#pn{position:fixed;top:0;right:0;width:340px;height:100%;background:var(--card);border-left:2px solid var(--ink);padding:26px 24px;transform:translateX(100%);transition:transform .22s;overflow:auto;z-index:9}
+#pn.o{transform:none}#pn h4{font:600 20px Georgia,serif;margin:0 0 6px}#pn dt{font-size:13px;color:var(--mut);margin-top:14px}#pn dd{margin:2px 0 0}
+#pn .x{position:absolute;top:14px;right:16px;background:none;border:0;font-size:24px;cursor:pointer}
+.ck{display:flex;gap:10px;margin:8px 0;max-width:640px;cursor:pointer}.sc button{background:none;border:1.5px solid var(--ink);padding:6px 14px;font:inherit;cursor:pointer}.sc button.on{background:var(--ink);color:#fff}
+button:focus-visible,input:focus-visible{outline:3px solid #e0a82e;outline-offset:2px}
+</style></head><body>
+<div id="app"><nav id="nav"></nav><main id="main"></main></div><aside id="pn" aria-live="polite"></aside>
+<script id="model">
+const A={cost:[90,110,140],exit:[.05,.0667,.075],open:[1800,2500,3000],dir:[900,1200,1500],res:[1000,1300,1400],bridge:[10,8,6],rcost:[35,25,18],pm:[15,12,9],sup:[20,15,10],chg:[15,12,10],sev:[12,18,24],hire:[10,15,20],samp:[400,400,400],pil:[1000,800,600],acost:[2.5,1.5,1],aset:[1,.6,.4]};
+function model(i,o){const g=k=>A[k][i],hc=6000,H=18,disp=Math.round(hc*.7),attr=Math.round(hc*g('exit')*H/12),open=o==null?g('open'):o,
+direct=Math.min(g('dir'),open),reskill=Math.min(g('res'),Math.max(open-direct,0)),redep=direct+reskill,spec=Math.max(disp-attr-redep,0),
+pkg=g('pm')/12*g('cost')+g('sup'),cspec=spec*pkg/1000,cass=(g('samp')+g('pil'))*g('acost')/1000+g('aset'),
+prog=direct*g('bridge')/1000+reskill*g('rcost')/1000+cspec+g('chg')+cass,tot=prog+3.5,strand=disp*g('cost')/1000,
+delay=disp*12/(2*H)*g('cost')/1000,lay=disp*(g('sev')/12*g('cost'))/1000+redep*g('hire')/1000;
+let c24=0;for(let m=1;m<=24;m++)c24+=disp*Math.min(1,(m-.5)/H)*g('cost')/12/1000;
+return{disp,attr,open,direct,reskill,redep,spec,cspec,cass,prog,tot,strand,delay,lay,save:lay-tot,pay:tot/(strand/12),c24}}
+</script>
+<script>
+const N=v=>Math.round(v).toLocaleString('en-US'),B=v=>v.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
+const t=(k,v,x)=>`<span class="t" data-t="${k}" data-v="${v}" tabindex="0">${x}</span>`;
+const ST={g:'Given by the engagement brief',a:'Assumption, not yet validated',s:'Screened, not measured',i:'Inferred from indirect signals',m:'Computed from the assumptions'};
+const T={
+disp:['Displaced work','g','Model D9; brief section 3','Medium','Use for cohort planning only. To be re-derived from task data and the procurement pipeline by Day 30.'],
+exp1:['Metering exposure','g','Brief section 3; smart-meter procurement already under way','Medium-high','Basis for the focus decision.'],
+exp:['Exposure rank','s','Task-content screen, no Client data yet','Low','A rank to decide where to look next. Not a forecast and not a basis for any decision about people.'],
+open:['Destination openings','a','Assumption A3','Low','The weakest link. Confirm open requisitions with division heads by Day 60. Offers are only made against open roles.'],
+dir:['Redeploy direct','a','Assumption A4; Model D15','Low','Plan as a range. Becomes real when assessed people receive offers in the pilot.'],
+res:['Reskill, then redeploy','a','Assumption A5; Model D16','Low','Plan as a range. Validate with the pilot cohort by Day 60.'],
+attr:['Natural exits','a','Assumption A2 (about 6.7% a year); Model D13','Medium','Counts only if these roles are not backfilled.'],
+spec:['Special track','m','Model D18: displaced work minus exits minus redeployed','Follows the above','Voluntary only. Anything the other paths cannot absorb lands here, so it moves with every assumption.'],
+tot:['One-time transformation cost','m','Model D30; assumptions A1, A6 to A16','Medium-low','The largest line is the voluntary special track.'],
+delay:['Cost of standing still, 12 months','m','Model D34; loaded cost per FTE is a range from public annual reports, no payroll','Medium','Valid if work disappears on the 18-month ramp. Use as a range.'],
+strand:['Stranded cost per year','m','Model D32','Medium','People paid for work that no longer exists, at full displacement.'],
+lay:['Layoff then rehire','m','Model D39. Reference only: not permitted by the Ministry','Low','Shown to size the avoided alternative. Not an option.'],
+pay:['Months of run-rate benefit to repay','m','Model D44','Medium-low','A floor from steady state, not a calendar payback date.'],
+c24:['Standing still, 24 months','m','Delay sheet, cumulative at month 24','Medium','Same ramp assumption as the 12-month figure.'],
+tier:['Evidence tier','i','Four tiers: A demonstrated, B attested, C inferred, D unknown','See tier','A weak signal can open an opportunity but never close one. Blank means unknown, never no skill.']};
+const F=[["Field Metering and Manual Operations",90,'m','Technology already being procured','exp1'],["Billing and customer back-office",70,'i','Document and data-entry automation','exp'],["Finance and procurement admin",60,'i','Routine processing','exp'],["HR, legal, corporate admin",50,'i','Document and query automation','exp'],["Grid control",40,'i','Decision support; safety-critical','exp'],["Distribution maintenance, plant operations",30,'i','Physical work, better monitoring','exp'],["Engineering and IT",25,'i','Augmentation more than replacement','exp'],["Leadership",15,'i','Judgment and accountability','exp']];
+const P=[["Slamet Riyadi","Meter Reader","West Java","G5","Smart-Meter Field Technician",[["Electrical safety (K3 Listrik)",3,"A"],["Meter installation",2,"B"],["Mobile app use",2,"C"]]],
+["Dewi Anggraini","Meter Reader","East Java","G4","Customer Field Verification",[["Customer communication",3,"B"],["Complaint handling",2,"C"],["Billing basics",2,"C"]]],
+["Agus Hartono","Senior Technician II","Central Java","G7","Loss and Revenue-Assurance Inspector",[["Meter inspection",4,"A"],["Tamper detection",3,"B"],["Data logging",2,"C"]]],
+["Siti Nurhaliza","Meter Reader","Sumatra","G4","Meter Data Exception Analyst",[["Spreadsheet analysis",2,"C"],["Billing basics",2,"C"],["Exception triage",1,"D"]]],
+["Budi Santoso","Engineer Madya","Kalimantan","G8","Smart-Meter Field Technician",[["Electrical installation",4,"A"],["IoT device setup",2,"B"],["Team coordination",3,"B"]]],
+["Rina Marlina","Meter Reader","West Java","G3","Distribution Maintenance Support",[["Field safety",2,"C"],["Basic wiring",1,"D"],["Equipment handling",2,"C"]]],
+["Joko Prasetyo","Meter Reader","Sulawesi","G4","Smart-Meter Field Technician",[["Skill record is blank",0,"D"]]],
+["Hendra Wijaya","Senior Technician II","East Java","G6","Distribution Maintenance Support",[["Electrical safety (K3 Listrik)",3,"A"],["Substation basics",2,"B"],["Fault finding",2,"C"]]],
+["Ratna Kusuma","Meter Reader","Central Java","G5","Customer Field Verification",[["Customer communication",4,"B"],["Local area knowledge",4,"C"],["Complaint handling",3,"B"]]],
+["Yusuf Hakim","Meter Reader","Sumatra","G3","Loss and Revenue-Assurance Inspector",[["Meter reading accuracy",4,"A"],["Tamper detection",1,"D"],["Reporting",2,"C"]]],
+["Maya Sari","Billing Clerk","Kalimantan","G5","Meter Data Exception Analyst",[["Billing data handling",3,"B"],["Exception triage",2,"C"],["Data validation",3,"B"]]],
+["Eko Susilo","Meter Reader","Sulawesi","G4","Smart-Meter Field Technician",[["Meter installation",1,"D"],["Mobile app use",1,"D"],["Electrical safety (K3 Listrik)",2,"C"]]]];
+const DEST=[["Smart-Meter Field Technician","Execute, Coordinate",900],["Loss and Revenue-Assurance Inspector","Execute, Supervise",500],["Customer Field Verification and Service","Execute, Supervise",450],["Distribution Maintenance Support","Execute",400],["Meter Data Exception Analyst","Supervise, Analyze",250]];
+const NAV=["The brief","Exposure map","Inside Metering","Pathways","People and evidence","Economics","The decision"];
+let scr=0,sc=1,op=2500,pi=0,cons=false,ck=[0,0,0,0];
+const $=s=>document.querySelector(s);
+const seg=(l,n,c,tot)=>`<div class="${c}" style="flex:${n}" title="${l}">${n/tot>.07?N(n):''}</div>`;
+const key=`<div class="key"><span><i class="m"></i>Given or measured</span><span><i class="i"></i>Inferred or screened</span><span><i class="a"></i>Assumption</span></div>`;
+const pips=(l,tier)=>`<span class="pip ${tier=='C'?'hc':tier=='D'?'d':''}">${[1,2,3,4,5].map(x=>`<u class="${x<=l&&tier!='D'||x<=l&&tier=='D'?'f':''}"></u>`).join('')}</span>`;
+const S=[
+()=>`<h1>Show the Board a workforce plan it can believe, in 90 days.</h1>
+<div class="row"><div class="big">Day 30</div><p class="mut" style="max-width:440px">of 90. The Board and the Ministry hear the plan on Day 90.</p></div>
+<h3>What the data work found</h3><p>One job family, Field Metering and Manual Operations, has about ${t('disp','4,200 FTE of displaced work','6,000 people')}, and roughly 70% of its work can be automated within 18 months. Another division is already buying the technology.</p>
+<h3>What you need to answer</h3><p>Who will AI displace, and what happens to them? How do we do it with no layoffs? How do we show the return in budget terms?</p>
+<p class="mut sm">Sample data. Underlined figures open their source, status, and confidence. Figures from the brief are marked as given; the rest are assumptions you can test.</p>
+<button class="btn" data-go="1">Open the Day 30 findings</button>`,
+()=>`<h1>Exposure concentrates in one family. The rest is a screen, not a finding.</h1><p>Bars show a rank, not a measurement. Only the first row rests on engagement data. Select a row to see its basis.</p>${key}
+${F.map(f=>`<div class="ex" data-t="${f[4]}" data-v="${f[1]>=90?'Very high':f[1]>=60?'High':f[1]>=40?'Medium':'Low'}" tabindex="0"><b>${f[0]}</b><div class="b ${f[2]}" style="width:${f[1]}%"></div><span class="sm mut">${f[3]}</span></div>`).join('')}
+<button class="btn" data-go="2">Look inside Metering</button>`,
+()=>{const m=model(1),tot=6000;return`<h1>Inside Metering, 4,200 FTE of work becomes four groups of people.</h1>
+<p>52,000 employees, 6,000 in Metering, ${t('disp','4,200 FTE, 8.1% of the workforce','4,200 FTE')} of work going away. The 1,800 FTE that remain stay in changed roles.</p>${key}
+<div class="bar">${seg('Stays',1800,'k',tot)}${seg('Redeploy direct',m.direct,'a',tot)}${seg('Reskill',m.reskill,'a',tot)}${seg('Exits',m.attr,'a',tot)}${seg('Special',m.spec,'sp',tot)}</div>
+<table><tr><th>Group</th><th>Defining evidence</th><th class="r">People</th></tr>
+<tr><td>Redeploy direct</td><td>Certification or experience adjacent to an open role</td><td class="r">${t('dir',N(m.direct)+' people',N(m.direct))}</td></tr>
+<tr><td>Reskill, then redeploy</td><td>Partial overlap, trainable in 6 to 12 months</td><td class="r">${t('res',N(m.reskill)+' people',N(m.reskill))}</td></tr>
+<tr><td>Natural exits</td><td>Retirement and resignation, not backfilled</td><td class="r">${t('attr',N(m.attr)+' people',N(m.attr))}</td></tr>
+<tr><td>Special track</td><td>No adjacent evidence, or unable or unwilling to move; voluntary only</td><td class="r">${t('spec',N(m.spec)+' people',N(m.spec))}</td></tr></table>
+<p class="mut sm" style="margin-top:12px">Dashed outlines mark assumptions. These counts become measured after the Day 60 pilot.</p>
+<button class="btn" data-go="3">See where they go</button>`},
+()=>`<h1>4,200 displaced roles become named paths. One assumption holds the plan up.</h1>
+<p>Move the number of open destination roles and watch the plan respond.</p>
+<label><b>Open destination roles</b> ${t('open','Assumption A3','(assumption)')}</label><br><input class="sl" id="sl" type="range" min="500" max="3000" step="50" value="${op}" aria-label="Open destination roles"><div class="sm mut">Base case: 2,500</div><div id="p4"></div>
+<button class="btn" data-go="4">Check the evidence behind a person</button>`,
+()=>{const p=P[pi],best=['A','B','C','D'].find(x=>p[5].some(s=>s[2]==x)),r=['A','B','C','D'].indexOf(best),L={A:'Demonstrated',B:'Attested',C:'Inferred',D:'Unknown'};
+return`<h1>A weak signal can open an opportunity. It can never close one.</h1><p>Twelve sample records, fictional. Each skill carries how we know it. The actions available depend on that evidence.</p>
+<div class="ppl"><div class="pl">${P.map((q,j)=>`<button class="${j==pi?'on':''}" data-p="${j}"><b>${q[0]}</b><br><span class="sm mut">${q[1]}, ${q[2]}</span></button>`).join('')}</div>
+<div><h3 style="margin-top:0">${p[0]}</h3><p class="mut">${p[1]}, grade ${p[3]}, ${p[2]}. Possible destination: ${p[4]}.</p>${key}
+<table><tr><th>Skill</th><th>Level</th><th>How we know</th></tr>${p[5].map(s=>`<tr><td>${s[0]}</td><td>${s[1]?pips(s[1],s[2]):'Unknown, not no skill'}</td><td>${t('tier',L[s[2]],L[s[2]])}</td></tr>`).join('')}</table>
+<h3>What the Director may do</h3>
+<div class="act"><button class="btn alt" ${r<=2?'':'disabled'} style="margin:0">Invite to training</button><span class="lock">${r<=2?'Allowed: inferred evidence or better.':'Locked: no evidence yet. Assess first.'}</span></div>
+<div class="act"><button class="btn alt" ${r<=1&&cons?'':'disabled'} style="margin:0">Offer redeployment path</button><span class="lock">${r<=1?'':'Locked: needs attested evidence. '}${cons?'':'Needs the person’s consent.'}</span></div>
+<label class="act sm"><input type="checkbox" id="cons" ${cons?'checked':''}> Person has agreed to be considered</label>
+<div class="act"><button class="btn alt" disabled style="margin:0">Any adverse decision</button><span class="lock">Never available on this data.</span></div></div></div>
+<button class="btn" data-go="5">See what it costs</button>`},
+()=>{const m=model(sc),mx=Math.max(m.c24,m.tot,m.lay);const w=v=>(v/mx*100).toFixed(1)+'%';
+return`<h1>Standing still costs more than acting, in all three scenarios.</h1>
+<div class="sc" style="margin:0 0 18px">${['Downside','Base','Upside'].map((x,j)=>`<button class="${j==sc?'on':''}" data-s="${j}">${x}</button>`).join('')}</div>
+<div class="split"><div>
+<p><b>${t('c24','Rp '+B(m.c24)+' bn over 24 months','Standing still, 24 months')}</b></p><div class="bar"><div class="a" style="flex:none;width:${w(m.c24)};justify-content:flex-end;padding-right:8px">Rp ${B(m.c24)} bn</div></div>
+<p><b>${t('tot','Rp '+B(m.tot)+' bn, one time','Acting, one time')}</b></p><div class="bar"><div class="m" style="flex:none;width:${w(m.tot)}">Rp ${B(m.tot)} bn</div></div>
+<p><b>${t('lay','Rp '+B(m.lay)+' bn, not permitted','Layoff then rehire, reference only')}</b></p><div class="bar"><div class="i" style="flex:none;width:${w(m.lay)}"></div></div><div class="sm">Rp ${B(m.lay)} bn</div>
+<table style="margin-top:16px"><tr><td>Standing still, first 12 months</td><td class="r">${t('delay','Rp '+B(m.delay)+' bn',B(m.delay))}</td></tr>
+<tr><td>Stranded cost per year at full displacement</td><td class="r">${t('strand','Rp '+B(m.strand)+' bn',B(m.strand))}</td></tr>
+<tr><td>Cheaper than the layoff route by</td><td class="r">${B(m.save)}</td></tr>
+<tr><td>Months of benefit to repay the one-time cost</td><td class="r">${t('pay',B(m.pay)+' months',B(m.pay))}</td></tr></table>
+<p class="mut sm">All figures in Rp billion. Assessment of people is included (Rp ${B(m.cass)} bn). Payroll data is not used.</p></div>
+<div class="side"><div class="n">${B(m.tot)}</div><div class="sm mut">Rp bn, one time</div><div class="warn sm" style="margin-top:20px">${sc==0?'In the Downside case the saving against the layoff route is thin: Rp '+B(m.save)+' bn.':'The largest cost line is the voluntary special track, Rp '+B(m.cspec)+' bn.'}</div></div></div>
+<button class="btn" data-go="6">Make the decision</button>`},
+()=>{const L=["Ministry confirms in writing that no layoff is part of this programme","Division heads confirm open roles in the adjacent bands","Union leadership briefed, working group agreed","Data charter signed: no adverse use of individual records"],ok=ck.every(x=>x);
+return`<h1>Approve the pilot when four conditions are true.</h1><p>The pilot covers one or two regional units for pathway offers, plus a practical assessment sample of about 400 people across all six units.</p>
+${L.map((x,j)=>`<label class="ck"><input type="checkbox" data-c="${j}" ${ck[j]?'checked':''}><span>${x}</span></label>`).join('')}
+<button class="btn" id="ap" ${ok?'':'disabled'}>Approve the pilot</button>
+<div id="dn">${ok?'':`<p class="mut sm" style="margin-top:10px">${ck.filter(x=>!x).length} condition(s) still open. Without the Ministry’s written position, nothing told to the union is credible.</p>`}</div>`}];
+function nav(){$('#nav').innerHTML=`<h2>Project Meridian</h2>`+NAV.map((x,j)=>`<button class="${j==scr?'on':''}" data-go="${j}"><span>${j+1}</span>${x}</button>`).join('')}
+function p4(){const m=model(1,op),b=model(1),dl=m.tot-b.tot,tt=4200,R=m.redep/2500;
+$('#p4').innerHTML=`<div class="bar" style="margin-top:22px">${seg('Direct',m.direct,'a',tt)}${seg('Reskill',m.reskill,'a',tt)}${seg('Exits',m.attr,'a',tt)}${seg('Special',m.spec,'sp',tt)}</div>
+<div class="split"><div><table><tr><th>Path</th><th class="r">People</th></tr><tr><td>Redeploy direct</td><td class="r">${t('dir',N(m.direct),N(m.direct))}</td></tr><tr><td>Reskill, then redeploy</td><td class="r">${t('res',N(m.reskill),N(m.reskill))}</td></tr><tr><td>Natural exits</td><td class="r">${t('attr',N(m.attr),N(m.attr))}</td></tr><tr><td><b>Special track, voluntary</b></td><td class="r"><b>${t('spec',N(m.spec),N(m.spec))}</b></td></tr></table>
+<h3>Where the redeployed go</h3><table>${DEST.map(d=>`<tr><td>${d[0]}</td><td class="sm mut">${d[1]}</td><td class="r">${N(d[2]*R)}</td></tr>`).join('')}</table></div>
+<div class="side"><div class="n">${B(m.tot)}</div><div class="sm mut">Rp bn one-time cost</div><div class="n" style="margin-top:16px;color:${dl>1?'var(--amb)':'var(--ink)'}">${dl>=0?'+':'−'}${B(Math.abs(dl))}</div><div class="sm mut">vs the 2,500 case</div><div class="n" style="margin-top:16px">${Math.round(m.spec/42)}%</div><div class="sm mut">of displaced in the special track</div></div></div>
+${op<1250?'<div class="warn">Below half the base openings. The plan is re-planned at the Day 60 gate, not presented as the Base case.</div>':''}`}
+function open(k,v){const d=T[k];$('#pn').innerHTML=`<button class="x" aria-label="Close">×</button><h4>${d[0]}</h4><b style="font:600 22px Georgia,serif">${v}</b><dl><dt>How sure are we</dt><dd>${ST[d[1]]}. Confidence: ${d[3]}.</dd><dt>Where it comes from</dt><dd>${d[2]}</dd><dt>What it can be used for</dt><dd>${d[4]}</dd></dl>`;$('#pn').classList.add('o')}
+function draw(){nav();$('#main').innerHTML=S[scr]();$('#main').scrollTop=0;window.scrollTo(0,0);if(scr==3)p4()}
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]'),tt=e.target.closest('[data-t]');
+if(e.target.closest('.x')){$('#pn').classList.remove('o');return}
+if(tt){open(tt.dataset.t,tt.dataset.v);return}
+if(g){scr=+g.dataset.go;$('#pn').classList.remove('o');draw();return}
+const p=e.target.closest('[data-p]');if(p){pi=+p.dataset.p;draw();return}
+const s=e.target.closest('[data-s]');if(s){sc=+s.dataset.s;draw();return}
+if(e.target.id=='ap'){$('#dn').innerHTML=`<div class="warn"><b>Pilot approved.</b> Next: brief union leadership, start assessments in the pilot units, and report the first results to the working group at Day 60.</div>`;e.target.disabled=true}});
+document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.dataset&&e.target.dataset.t)open(e.target.dataset.t,e.target.dataset.v);if(e.key=='Escape')$('#pn').classList.remove('o')});
+document.addEventListener('input',e=>{if(e.target.id=='sl'){op=+e.target.value;p4()}});
+document.addEventListener('change',e=>{if(e.target.id=='cons'){cons=e.target.checked;draw()}if(e.target.dataset.c!=null){ck[+e.target.dataset.c]=e.target.checked?1:0;draw()}});
+draw();
+</script></body></html>
